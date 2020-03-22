@@ -1,0 +1,83 @@
+from telegram.ext import Updater
+from telegram.ext import CommandHandler
+from telegram.ext import MessageHandler, Filters
+import telegram.ext
+import logging
+import config
+from uuid import uuid4
+
+updater = Updater(token=config.token, use_context=True)
+dispatcher = updater.dispatcher
+job_queue = updater.job_queue
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+
+def echo(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+
+def caps(update, context):
+    text_caps = ' '.join(context.args).upper()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
+
+def unknown(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
+
+def new_announcement(update, context):
+    key = str(uuid4())
+    value = ' '.join(context.args)
+
+    #Store value
+    context.chat_data[key] = value
+
+    context.bot.send_message(chat_id=update.effective_chat.id, text=key)
+
+def get_announcement(update, context):
+    key = ' '.join(context.args)
+    
+    # Load value
+    try:
+        value = context.chat_data[key]
+        update.message.reply_text(value)
+
+    except KeyError:
+        update.message.reply_text('Announcement not found')
+
+def get_all_announcements(update, context):
+    # Check if there are any announcements at all
+    if not context.chat_data:
+        text = 'No announcements available. Use /new_announcement to add a new one'
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+    else:
+        for key, value in context.chat_data.items():
+            text = key, "->", value
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+def callback_minute(context: telegram.ext.CallbackContext):
+    context.bot.send_message(chat_id='158794071', # set chatid 
+                             text='One message every minute')
+
+job_minute = job_queue.run_repeating(callback_minute, interval=60, first=0)
+
+
+start_handler = CommandHandler('start', start)
+caps_handler = CommandHandler('caps', caps)
+echo_handler = MessageHandler(Filters.text, echo)
+unknown_handler = MessageHandler(Filters.command, unknown)
+new_announcement_handler = CommandHandler('new_announcement', new_announcement)
+get_announcement_handler = CommandHandler('get_announcement', get_announcement)
+get_all_announcements_handler = CommandHandler('get_all', get_all_announcements)
+
+# Note to self: order of adding the handlers are important
+dispatcher.add_handler(start_handler)
+dispatcher.add_handler(caps_handler)
+dispatcher.add_handler(new_announcement_handler)
+dispatcher.add_handler(get_announcement_handler)
+dispatcher.add_handler(get_all_announcements_handler)
+dispatcher.add_handler(echo_handler)
+dispatcher.add_handler(unknown_handler)
+
+
+updater.start_polling()
