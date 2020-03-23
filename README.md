@@ -14,6 +14,9 @@ This is a telegram bot built for Garuda (CAPT, NUS). It is a work in progress. I
 	- Bot should make these announcements daily until the expiry
 - Payment system
 	- Payment system using Telegram's payment API for Garuda housecomm events or sales
+- Save pictures
+	- ~~Save pictures uploaded by user~~
+	- Upload photos to gdrive
 
 ### Contact
 
