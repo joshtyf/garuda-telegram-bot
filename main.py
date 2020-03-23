@@ -1,10 +1,12 @@
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
+from telegram.error import TelegramError
 import telegram.ext
 import logging
 import config
 from uuid import uuid4
+import os
 
 updater = Updater(token=config.token, use_context=True)
 dispatcher = updater.dispatcher
@@ -15,8 +17,18 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
 
-def echo(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+def get_pic(update, context):
+    try:
+        file = update.message.photo[-1].get_file()
+        file_name = file.download()
+        context.bot.send_message(chat_id=update.effective_chat.id, text="File downloaded")
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        else:
+            print("The file does not exist")
+    except IndexError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="We only accept images at the moment")
+
 
 def caps(update, context):
     text_caps = ' '.join(context.args).upper()
@@ -59,12 +71,12 @@ def callback_minute(context: telegram.ext.CallbackContext):
     context.bot.send_message(chat_id='158794071', # set chatid 
                              text='One message every minute')
 
-job_minute = job_queue.run_repeating(callback_minute, interval=60, first=0)
+# job_minute = job_queue.run_repeating(callback_minute, interval=60, first=0)
 
 
 start_handler = CommandHandler('start', start)
 caps_handler = CommandHandler('caps', caps)
-echo_handler = MessageHandler(Filters.text, echo)
+picture_handler = MessageHandler(Filters.all, get_pic)
 unknown_handler = MessageHandler(Filters.command, unknown)
 new_announcement_handler = CommandHandler('new_announcement', new_announcement)
 get_announcement_handler = CommandHandler('get_announcement', get_announcement)
@@ -76,7 +88,7 @@ dispatcher.add_handler(caps_handler)
 dispatcher.add_handler(new_announcement_handler)
 dispatcher.add_handler(get_announcement_handler)
 dispatcher.add_handler(get_all_announcements_handler)
-dispatcher.add_handler(echo_handler)
+dispatcher.add_handler(picture_handler)
 dispatcher.add_handler(unknown_handler)
 
 
