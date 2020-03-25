@@ -7,6 +7,10 @@ import logging
 import config
 from uuid import uuid4
 import os
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
+
 
 updater = Updater(token=config.token, use_context=True)
 dispatcher = updater.dispatcher
@@ -19,13 +23,24 @@ def start(update, context):
 
 def get_pic(update, context):
     try:
+        # Download the file
         file = update.message.photo[-1].get_file()
         file_name = file.download()
         context.bot.send_message(chat_id=update.effective_chat.id, text="File downloaded")
-        if os.path.exists(file_name):
-            os.remove(file_name)
-        else:
-            print("The file does not exist")
+        
+        # Authorise to gdrive
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication.
+        drive = GoogleDrive(gauth)
+
+        # Upload file
+        folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
+        file = drive.CreateFile({'parents': [{'id': folder['id']}]})
+        file.SetContentFile(file_name)
+        file.Upload()
+
+        # Remove the file once uploaded
+        os.remove(file_name)
     except IndexError:
         context.bot.send_message(chat_id=update.effective_chat.id, text="We only accept images at the moment")
 
