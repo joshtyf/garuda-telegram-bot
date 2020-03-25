@@ -4,8 +4,14 @@ This is a telegram bot built for Garuda (CAPT, NUS). It is a work in progress. I
 
 ## Table of contents
 
+- [Features](#features)
 - [Todo](#todo)
 - [Contact](#contact)
+
+
+### Features
+
+- Supports uploading of photos to gdrive
 
 ### Todo
 
@@ -14,9 +20,13 @@ This is a telegram bot built for Garuda (CAPT, NUS). It is a work in progress. I
 	- Bot should make these announcements daily until the expiry
 - Payment system
 	- Payment system using Telegram's payment API for Garuda housecomm events or sales
-- Save pictures
+- Save pictures to gdrive
 	- ~~Save pictures uploaded by user~~
-	- Upload photos to gdrive
+	- ~~Upload photos to gdrive~~
+	- Clean up auth process
+	- Create command for gdrive upload
+- Host bot on Heroku server
+
 
 ### Contact
 
