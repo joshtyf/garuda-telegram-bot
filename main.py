@@ -7,47 +7,71 @@ import logging
 import config
 from uuid import uuid4
 import os
-from pydrive.auth import GoogleAuth
+from pydrive.auth import AuthenticationError, GoogleAuth
 from pydrive.drive import GoogleDrive
-
+from pydrive.files import ApiRequestError
 
 
 updater = Updater(token=config.token, use_context=True)
 dispatcher = updater.dispatcher
 job_queue = updater.job_queue
 
+# Set logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
+ # Connect to gdrive
+try:
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication.
+    drive = GoogleDrive(gauth)
+except AuthenticationError:
+    print("Authentication Error")
+
+
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello fellow Garudian!")
 
 def get_pic(update, context):
     try:
-        # Download the file
+        # Download the picture
         file = update.message.photo[-1].get_file()
         file_name = file.download()
-        context.bot.send_message(chat_id=update.effective_chat.id, text="File downloaded")
-        
-        # Authorise to gdrive
-        gauth = GoogleAuth()
-        gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication.
-        drive = GoogleDrive(gauth)
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
 
         # Upload file
-        folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
-        file = drive.CreateFile({'parents': [{'id': folder['id']}]})
-        file.SetContentFile(file_name)
-        file.Upload()
+        try:
+            folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
+            file = drive.CreateFile({'parents': [{'id': folder['id']}]})
+            file.SetContentFile(file_name)
+            file.Upload()
+        except ApiRequestError:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
 
         # Remove the file once uploaded
         os.remove(file_name)
     except IndexError:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="We only accept images at the moment")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="I couldn't receive the image. Are you sure you sent it correctly?")
 
+def get_pic_file(update, context):
+    try:
+        # Download the file
+        file = update.message.document.get_file()
+        file_name = file.download()
+        context.bot.send_message(chat_id=update.effective_chat.id, text="File recevied")
 
-def caps(update, context):
-    text_caps = ' '.join(context.args).upper()
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
+        # Upload file
+        try:
+            folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
+            file = drive.CreateFile({'parents': [{'id': folder['id']}]})
+            file.SetContentFile(file_name)
+            file.Upload()
+        except ApiRequestError:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
+
+        # Remove the file once uploaded
+        os.remove(file_name)
+    except TelegramError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="I couldn't receive the image file. Are you sure you sent it correctly?")
 
 def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
@@ -82,16 +106,10 @@ def get_all_announcements(update, context):
             text = key, "->", value
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-def callback_minute(context: telegram.ext.CallbackContext):
-    context.bot.send_message(chat_id='158794071', # set chatid 
-                             text='One message every minute')
-
-# job_minute = job_queue.run_repeating(callback_minute, interval=60, first=0)
-
 
 start_handler = CommandHandler('start', start)
-caps_handler = CommandHandler('caps', caps)
-picture_handler = MessageHandler(Filters.all, get_pic)
+picture_handler = MessageHandler(Filters.photo, get_pic)
+pic_file_handler = MessageHandler(Filters.document.image, get_pic_file)
 unknown_handler = MessageHandler(Filters.command, unknown)
 new_announcement_handler = CommandHandler('new_announcement', new_announcement)
 get_announcement_handler = CommandHandler('get_announcement', get_announcement)
@@ -99,12 +117,11 @@ get_all_announcements_handler = CommandHandler('get_all', get_all_announcements)
 
 # Note to self: order of adding the handlers are important
 dispatcher.add_handler(start_handler)
-dispatcher.add_handler(caps_handler)
 dispatcher.add_handler(new_announcement_handler)
 dispatcher.add_handler(get_announcement_handler)
 dispatcher.add_handler(get_all_announcements_handler)
 dispatcher.add_handler(picture_handler)
+dispatcher.add_handler(pic_file_handler)
 dispatcher.add_handler(unknown_handler)
-
 
 updater.start_polling()
