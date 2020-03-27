@@ -37,12 +37,11 @@ except AuthenticationError:
 
 
 def start(update, context):
-    text = """Hello fellow Garudian! I am still a work in progress, so please treat me nicely. 
-    Type /help to get instructions on how to upload pictures for Garu.png"""
+    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. Type /help to get instructions on how to upload pictures for Garu.png."
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def help(update, context):
-    text = "Send a picture to me and I will automatically upload it to house comm's google drive. Sending it as an uncompressed file works too!"
+    text = "Send a picture to me and I will automatically upload it to house comm's google drive. Sending it as an uncompressed file works best!"
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def get_pic(update, context):
@@ -52,7 +51,7 @@ def get_pic(update, context):
         file_name = file.download()
         context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
 
-        # Upload file
+        # Upload picture
         try:
             folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
             file = drive.CreateFile({'parents': [{'id': folder['id']}]})
@@ -61,12 +60,33 @@ def get_pic(update, context):
         except ApiRequestError:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
 
-        # Remove the file once uploaded
+        # Remove the picture once uploaded
         os.remove(file_name)
     except IndexError:
         context.bot.send_message(chat_id=update.effective_chat.id, text="I couldn't receive the image. Are you sure you sent it correctly?")
 
-def get_pic_file(update, context):
+def get_vid(update, context):
+    try:
+        # Download the video
+        file = update.message.video.get_file()
+        file_name = file.download()
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
+
+        # Upload video
+        try:
+            folder = drive.ListFile({'q': "title='garu.jpg'"}).GetList()[0]
+            file = drive.CreateFile({'parents': [{'id': folder['id']}]})
+            file.SetContentFile(file_name)
+            file.Upload()
+        except ApiRequestError:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
+
+        # Remove the video once uploaded
+        os.remove(file_name)
+    except IndexError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="I couldn't receive the video. Are you sure you sent it correctly?")
+
+def get_file(update, context):
     try:
         # Download the file
         file = update.message.document.get_file()
@@ -123,7 +143,8 @@ def get_all_announcements(update, context):
 
 start_handler = CommandHandler('start', start)
 picture_handler = MessageHandler(Filters.photo, get_pic)
-pic_file_handler = MessageHandler(Filters.document.image, get_pic_file)
+video_handler = MessageHandler(Filters.video, get_vid)
+file_handler = MessageHandler(Filters.document.image, get_file)
 unknown_handler = MessageHandler(Filters.command, unknown)
 new_announcement_handler = CommandHandler('new_announcement', new_announcement)
 get_announcement_handler = CommandHandler('get_announcement', get_announcement)
@@ -136,7 +157,8 @@ dispatcher.add_handler(new_announcement_handler)
 dispatcher.add_handler(get_announcement_handler)
 dispatcher.add_handler(get_all_announcements_handler)
 dispatcher.add_handler(picture_handler)
-dispatcher.add_handler(pic_file_handler)
+dispatcher.add_handler(video_handler)
+dispatcher.add_handler(file_handler)
 dispatcher.add_handler(help_handler)
 dispatcher.add_handler(unknown_handler)
 
