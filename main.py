@@ -10,8 +10,17 @@ import os
 from pydrive.auth import AuthenticationError, GoogleAuth
 from pydrive.drive import GoogleDrive
 from pydrive.files import ApiRequestError
+import json
+from oauth2client.file import Storage
 
+# Get env variables
 TOKEN = os.environ['token']
+CREDENTIALS = os.environ['client_credentials']
+json_object = json.loads(CREDENTIALS) # creates a json file based of the client_credentials
+with open('client_credentials.json', 'w') as outfile:
+    json.dump(json_object, outfile)
+
+# Construct Telegram updater and dispatcher objects
 updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 job_queue = updater.job_queue
@@ -22,7 +31,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
  # Connect to gdrive
 try:
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication.
+    gauth.credentials = Storage('client_credentials.json').get()
     drive = GoogleDrive(gauth)
 except AuthenticationError:
     print("Authentication Error")
