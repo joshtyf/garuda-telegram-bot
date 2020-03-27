@@ -37,7 +37,7 @@ except AuthenticationError:
 
 
 def start(update, context):
-    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. Type /help to get instructions on how to upload files for Garu.png."
+    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. Type /help to get instructions on how to upload files for garu.jpg."
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def help(update, context):
