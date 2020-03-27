@@ -25,7 +25,7 @@ This is a telegram bot built for Garuda (CAPT, NUS). It is a work in progress. I
 	- ~~Upload photos to gdrive~~
 	- Clean up auth process
 	- Create command for gdrive upload
-- Host bot on Heroku server
+- ~~Host bot on Heroku server~~
 
 
 ### Contact
