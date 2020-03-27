@@ -11,8 +11,8 @@ from pydrive.auth import AuthenticationError, GoogleAuth
 from pydrive.drive import GoogleDrive
 from pydrive.files import ApiRequestError
 
-
-updater = Updater(token=config.token, use_context=True)
+TOKEN = os.environ['token']
+updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 job_queue = updater.job_queue
 
@@ -124,4 +124,11 @@ dispatcher.add_handler(picture_handler)
 dispatcher.add_handler(pic_file_handler)
 dispatcher.add_handler(unknown_handler)
 
-updater.start_polling()
+PORT = int(os.environ.get('PORT', '8443'))
+
+if __name__ == "__main__":
+    updater.start_webhook(listen="0.0.0.0",
+                        port=PORT,
+                        url_path=TOKEN)
+    updater.bot.set_webhook("https://hidden-anchorage-87038.herokuapp.com/" + TOKEN)
+    updater.idle()
