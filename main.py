@@ -38,7 +38,7 @@ except AuthenticationError:
 
 def start(update, context):
     text = """Hello fellow Garudian! I am still a work in progress, so please treat me nicely. 
-            Type /help to get instructions on how to upload pictures for Garu.png"""
+    Type /help to get instructions on how to upload pictures for Garu.png"""
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def help(update, context):
@@ -137,8 +137,8 @@ dispatcher.add_handler(get_announcement_handler)
 dispatcher.add_handler(get_all_announcements_handler)
 dispatcher.add_handler(picture_handler)
 dispatcher.add_handler(pic_file_handler)
-dispatcher.add_handler(unknown_handler)
 dispatcher.add_handler(help_handler)
+dispatcher.add_handler(unknown_handler)
 
 PORT = int(os.environ.get('PORT', '8443'))
 
