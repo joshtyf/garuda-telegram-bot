@@ -37,11 +37,11 @@ except AuthenticationError:
 
 
 def start(update, context):
-    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. Type /help to get instructions on how to upload pictures for Garu.png."
+    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. Type /help to get instructions on how to upload files for Garu.png."
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def help(update, context):
-    text = "Send a picture to me and I will automatically upload it to house comm's google drive. Sending it as an uncompressed file works best!"
+    text = "Send a picture or a video to me and I will automatically upload it to house comm's google drive. Sending it as an uncompressed file works best!"
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def get_pic(update, context):
