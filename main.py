@@ -4,7 +4,6 @@ from telegram.ext import MessageHandler, Filters
 from telegram.error import TelegramError
 import telegram.ext
 import logging
-import config
 from uuid import uuid4
 import os
 from pydrive.auth import AuthenticationError, GoogleAuth
