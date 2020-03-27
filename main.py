@@ -37,7 +37,13 @@ except AuthenticationError:
 
 
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello fellow Garudian!")
+    text = """Hello fellow Garudian! I am still a work in progress, so please treat me nicely. 
+            Type /help to get instructions on how to upload pictures for Garu.png"""
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+def help(update, context):
+    text = "Send a picture to me and I will automatically upload it to house comm's google drive. Sending it as an uncompressed file works too!"
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def get_pic(update, context):
     try:
@@ -122,6 +128,7 @@ unknown_handler = MessageHandler(Filters.command, unknown)
 new_announcement_handler = CommandHandler('new_announcement', new_announcement)
 get_announcement_handler = CommandHandler('get_announcement', get_announcement)
 get_all_announcements_handler = CommandHandler('get_all', get_all_announcements)
+help_handler = CommandHandler('help', help)
 
 # Note to self: order of adding the handlers are important
 dispatcher.add_handler(start_handler)
@@ -131,6 +138,7 @@ dispatcher.add_handler(get_all_announcements_handler)
 dispatcher.add_handler(picture_handler)
 dispatcher.add_handler(pic_file_handler)
 dispatcher.add_handler(unknown_handler)
+dispatcher.add_handler(help_handler)
 
 PORT = int(os.environ.get('PORT', '8443'))
 
