@@ -14,10 +14,12 @@ from oauth2client.file import Storage
 
 # Get env variables
 TOKEN = os.environ['token']
+SECRET = os.environ['client_secrets']
 CREDENTIALS = os.environ['client_credentials']
-json_object = json.loads(CREDENTIALS) # creates a json file based of the client_credentials
-with open('client_credentials.json', 'w') as outfile:
-    json.dump(json_object, outfile)
+
+json_secret = json.loads(SECRET) # creates a json file based of the client_credentials
+with open('client_secrets.json', 'w') as outfile:
+    json.dump(json_secret, outfile)
 
 # Construct Telegram updater and dispatcher objects
 updater = Updater(token=TOKEN, use_context=True)
@@ -30,7 +32,11 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
  # Connect to gdrive
 try:
     gauth = GoogleAuth()
-    gauth.credentials = Storage('client_credentials.json').get()
+    if gauth.credentials is None:
+        json_credentials = json.loads(CREDENTIALS) # creates a json file based of the client_credentials
+        with open('credentials.json', 'w') as outfile:
+            json.dump(json_credentials, outfile)
+        gauth.credentials = Storage('credentials.json').get()
     drive = GoogleDrive(gauth)
 except AuthenticationError:
     print("Authentication Error")
