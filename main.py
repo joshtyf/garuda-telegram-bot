@@ -11,6 +11,7 @@ from pydrive.drive import GoogleDrive
 from pydrive.files import ApiRequestError
 import json
 from oauth2client.file import Storage
+import datetime
 
 # Get env variables
 TOKEN = os.environ['token']
@@ -20,6 +21,14 @@ CREDENTIALS = os.environ['client_credentials']
 json_secret = json.loads(SECRET) # creates a json file based of the client_credentials
 with open('client_secrets.json', 'w') as outfile:
     json.dump(json_secret, outfile)
+
+if os.path.exists("client_credentials.json"):
+  os.remove("client_credentials.json")
+  print("file deleted")
+else:
+  print("The file does not exist")
+
+
 
 # Construct Telegram updater and dispatcher objects
 updater = Updater(token=TOKEN, use_context=True)
@@ -32,6 +41,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
  # Connect to gdrive
 try:
     gauth = GoogleAuth()
+    # Manually load the credentials
     if gauth.credentials is None:
         json_credentials = json.loads(CREDENTIALS) # creates a json file based of the client_credentials
         with open('credentials.json', 'w') as outfile:
@@ -142,10 +152,23 @@ def get_all_announcements(update, context):
         text = 'No announcements available. Use /new_announcement to add a new one'
         context.bot.send_message(chat_id=update.effective_chat.id, text=text)
     else:
+        text = "*Here are all the announcements*: \n\n"
         for key, value in context.chat_data.items():
-            text = key, "->", value
-            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+            text += value + "\n\n"
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
+def daily_announcements(context:telegram.ext.CallbackContext):
+    # Check if there are any announcements at all
+    if  context.chat_data:
+        text = "*Here are the daily announcements:* \n\n"
+        for key, value in context.chat_data.items():
+            text = value + "\n\n"
+        context.bot.send_message(chat_id='158794071', text=text) # change the chat id to the house chat
+
+timedelta = datetime.timedelta(hours=8)
+tzinfo = datetime.timezone(timedelta)
+job_queue.run_daily(daily_announcements, datetime.time(hour=8,tzinfo=tzinfo))
+    
 
 start_handler = CommandHandler('start', start)
 picture_handler = MessageHandler(Filters.photo, get_pic)
@@ -171,7 +194,8 @@ dispatcher.add_handler(unknown_handler)
 PORT = int(os.environ.get('PORT', '8443'))
 
 if __name__ == "__main__":
-    updater.start_webhook(listen="0.0.0.0",
+    # updater.start_polling() # Use on local
+    updater.start_webhook(listen="0.0.0.0", # Use on web server
                         port=PORT,
                         url_path=TOKEN)
     updater.bot.set_webhook("https://hidden-anchorage-87038.herokuapp.com/" + TOKEN)
