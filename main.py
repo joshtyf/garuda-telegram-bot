@@ -18,17 +18,9 @@ TOKEN = os.environ['token']
 SECRET = os.environ['client_secrets']
 CREDENTIALS = os.environ['client_credentials']
 
-json_secret = json.loads(SECRET) # creates a json file based of the client_credentials
+json_secret = json.loads(SECRET) # creates a json file based of the client_secrets
 with open('client_secrets.json', 'w') as outfile:
     json.dump(json_secret, outfile)
-
-if os.path.exists("client_credentials.json"):
-  os.remove("client_credentials.json")
-  print("file deleted")
-else:
-  print("The file does not exist")
-
-
 
 # Construct Telegram updater and dispatcher objects
 updater = Updater(token=TOKEN, use_context=True)
@@ -65,7 +57,7 @@ def get_pic(update, context):
         # Download the picture
         file = update.message.photo[-1].get_file()
         file_name = file.download()
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
+        message = context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
 
         # Upload picture
         try:
@@ -73,6 +65,7 @@ def get_pic(update, context):
             file = drive.CreateFile({'parents': [{'id': folder['id']}]})
             file.SetContentFile(file_name)
             file.Upload()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text="Picture uploaded")
         except ApiRequestError:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
 
@@ -86,7 +79,7 @@ def get_vid(update, context):
         # Download the video
         file = update.message.video.get_file()
         file_name = file.download()
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Picture received")
+        message = context.bot.send_message(chat_id=update.effective_chat.id, text="Video received")
 
         # Upload video
         try:
@@ -94,6 +87,7 @@ def get_vid(update, context):
             file = drive.CreateFile({'parents': [{'id': folder['id']}]})
             file.SetContentFile(file_name)
             file.Upload()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text="Video uploaded")
         except ApiRequestError:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
 
@@ -107,7 +101,7 @@ def get_file(update, context):
         # Download the file
         file = update.message.document.get_file()
         file_name = file.download()
-        context.bot.send_message(chat_id=update.effective_chat.id, text="File recevied")
+        message = context.bot.send_message(chat_id=update.effective_chat.id, text="File recevied")
 
         # Upload file
         try:
@@ -115,6 +109,7 @@ def get_file(update, context):
             file = drive.CreateFile({'parents': [{'id': folder['id']}]})
             file.SetContentFile(file_name)
             file.Upload()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text="File uploaded")
         except ApiRequestError:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Upload failed. Please contact admin")
 
@@ -152,18 +147,18 @@ def get_all_announcements(update, context):
         text = 'No announcements available. Use /new_announcement to add a new one'
         context.bot.send_message(chat_id=update.effective_chat.id, text=text)
     else:
-        text = "*Here are all the announcements*: \n\n"
+        text = "**Here are all the announcements:** \n\n"
         for key, value in context.chat_data.items():
             text += value + "\n\n"
-        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
 def daily_announcements(context:telegram.ext.CallbackContext):
     # Check if there are any announcements at all
     if  context.chat_data:
-        text = "*Here are the daily announcements:* \n\n"
+        text = "**Here are the daily announcements:** \n\n"
         for key, value in context.chat_data.items():
             text = value + "\n\n"
-        context.bot.send_message(chat_id='158794071', text=text) # change the chat id to the house chat
+        context.bot.send_message(chat_id='158794071', text=text, parse_mode='Markdown') # change the chat id to the house chat
 
 timedelta = datetime.timedelta(hours=8)
 tzinfo = datetime.timezone(timedelta)
