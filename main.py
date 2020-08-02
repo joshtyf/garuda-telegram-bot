@@ -34,7 +34,7 @@ def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
 start_handler = CommandHandler('start', start)
-uhms_link_handler = CommandHandler('get_uhms_link, get_uhms_link', get_uhms_link)
+uhms_link_handler = CommandHandler('get_uhms_link', get_uhms_link)
 meal_credits_handler = CommandHandler('get_meal_credits_link', get_meal_credits_link)
 unknown_handler = MessageHandler(Filters.command, unknown)
 
