@@ -32,12 +32,12 @@ unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(unknown_handler)
 
-# PORT = int(os.environ.get('PORT', '8443'))
+PORT = int(os.environ.get('PORT', '8443'))
 
 if __name__ == "__main__":
-    updater.start_polling() # Use on local
-    # updater.start_webhook(listen="0.0.0.0", # Use on web server
-    #                     port=PORT,
-    #                     url_path=TOKEN)
-    # updater.bot.set_webhook("https://hidden-anchorage-87038.herokuapp.com/" + TOKEN)
+    # updater.start_polling() # Use on local
+    updater.start_webhook(listen="0.0.0.0", # Use on web server
+                        port=PORT,
+                        url_path=TOKEN)
+    updater.bot.set_webhook("https://hidden-anchorage-87038.herokuapp.com/" + TOKEN)
     updater.idle()
