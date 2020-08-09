@@ -1,11 +1,13 @@
 from telegram.ext import Updater
-from telegram.ext import CommandHandler
-from telegram.ext import MessageHandler, Filters
+from telegram.ext import CommandHandler, ConversationHandler, MessageHandler, Filters
 from telegram.error import TelegramError
 import telegram.ext
 import logging
 from uuid import uuid4
+from doorway_submission import get_conv_handler
 import os
+
+
 
 TOKEN = os.environ['token']
 
@@ -16,7 +18,6 @@ job_queue = updater.job_queue
 
 # Set logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
 
 def start(update, context):
     text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely"
@@ -42,6 +43,7 @@ unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(uhms_link_handler)
 dispatcher.add_handler(meal_credits_handler)
+dispatcher.add_handler(get_conv_handler())
 dispatcher.add_handler(unknown_handler)
 
 PORT = int(os.environ.get('PORT', '8443'))
