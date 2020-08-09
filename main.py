@@ -20,7 +20,7 @@ job_queue = updater.job_queue
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def start(update, context):
-    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely"
+    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. You can get a list of available commands by typing /"
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def get_uhms_link(update, context):

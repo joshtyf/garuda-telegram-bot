@@ -33,9 +33,9 @@ def get_conv_handler():
         entry_points=[CommandHandler('upload_doorway_picture', upload_door_pic)],
 
         states={
-            ZONE: [MessageHandler(Filters.regex('^(Zone A|Zone B|Zone C|Zone D)$'), get_zone)],
-
             NAME: [MessageHandler(Filters.text & ~Filters.command, get_name)],
+
+            ZONE: [MessageHandler(Filters.regex('^(Zone A|Zone B|Zone C|Zone D)$'), get_zone)],
 
             PHOTO: [MessageHandler(Filters.photo, get_pic)],
         },
@@ -44,15 +44,14 @@ def get_conv_handler():
     )
 
 def upload_door_pic(update, context):
-    reply_keyboard = [['Zone A', 'Zone B', 'Zone C', 'Zone D']]
 
     update.message.reply_text(
-        'Hi! '
-        'Send /cancel to stop talking to me.\n\n'
-        'What zone are you from?',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        'Hi there! '
+        'You may send /cancel at any time before uploading the picture to stop this process\n\n'
+        'May I know your name?',
+        )
 
-    return ZONE
+    return NAME
 
 def get_pic(update, context):
     try:
@@ -80,19 +79,22 @@ def get_pic(update, context):
 def get_zone(update, context):
     context.user_data['zone'] = update.message.text
     update.message.reply_text(
-        f'So you are from {update.message.text}! Can you tell me your name?\n'
-        'If you selected the wrong zone, send /cancel to stop. Then send /upload_doorway_picture again',
+        f'So you are from {update.message.text}! Now, send me the photo you wish to upload!\n'
+        'If you selected the wrong zone, send /cancel to stop. Then send /upload_doorway_picture to start again',
         reply_markup=ReplyKeyboardRemove())
 
-    return NAME
+    return PHOTO
 
 def get_name(update, context):
     context.user_data['name'] = update.message.text
-    update.message.reply_text(
-        f'Hi {update.message.text}! Now, send me the photo you want to upload!\n'
-        'If you typed your name wrongly, send /cancel to stop. Then send /upload_doorway_picture again')
+    reply_keyboard = [['Zone A', 'Zone B', 'Zone C', 'Zone D']]
 
-    return PHOTO
+    update.message.reply_text(
+        f'Hi {update.message.text}! Now, may I know which zone you belong to?\n'
+        'If you typed your name wrongly, send /cancel to stop. Then send /upload_doorway_picture to start again', 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
+    return ZONE
 
 def cancel(update, context):
     update.message.reply_text('Bye!',
