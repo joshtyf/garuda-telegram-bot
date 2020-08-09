@@ -34,7 +34,7 @@ def get_meal_credits_link(update, context):
 def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
-def help(update, context):
+def help_command(update, context):
     text = '''These are the available commands: \n 
     /upload_doorway_picture - for you to upload your doorway picture \n
     /get_uhms_link - gets the link for the uhms website \n
@@ -44,7 +44,7 @@ def help(update, context):
 start_handler = CommandHandler('start', start)
 uhms_link_handler = CommandHandler('get_uhms_link', get_uhms_link)
 meal_credits_handler = CommandHandler('get_meal_credits_link', get_meal_credits_link)
-help_handler =  CommandHandler('help', help)
+help_handler =  CommandHandler('help', help_command)
 unknown_handler = MessageHandler(Filters.command, unknown)
 
 # Note to self: order of adding the handlers are important
