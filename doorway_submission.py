@@ -9,11 +9,6 @@ from oauth2client.file import Storage
 import json
 
 # GDrive auth
-gauth = GoogleAuth()
-gauth.LocalWebserverAuth()
-drive = GoogleDrive(gauth)
-gauth.LoadCredentials
-
 SECRET = os.environ['client_secrets']
 CREDENTIALS = os.environ['client_credentials']
 ZONE, NAME, PHOTO = range(3)
