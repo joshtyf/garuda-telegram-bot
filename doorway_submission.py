@@ -28,7 +28,7 @@ try:
         json_credentials = json.loads(CREDENTIALS) # creates a json file based of the client_credentials
         with open('credentials.json', 'w') as outfile:
             json.dump(json_credentials, outfile)
-        gauth.LoadCredentialsFile('credentials.json')
+        gauth.credentials = Storage('credentials.json').get()
     drive = GoogleDrive(gauth)
 except AuthenticationError:
     print("Authentication Error")
