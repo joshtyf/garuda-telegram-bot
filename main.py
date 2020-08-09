@@ -35,10 +35,10 @@ def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
 def help_command(update, context):
-    text = '''These are the available commands: \n 
-    /upload_doorway_picture - for you to upload your doorway picture \n
-    /get_uhms_link - gets the link for the uhms website \n
-    /get_meal_credits_link - gets the link to check for your meal credit balance'''
+    text = '''These are the available commands: \n
+/upload_doorway_picture - for you to upload your doorway picture \n
+/get_uhms_link - gets the link for the uhms website \n
+/get_meal_credits_link - gets the link to check for your meal credit balance'''
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 start_handler = CommandHandler('start', start)
