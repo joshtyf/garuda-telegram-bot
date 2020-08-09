@@ -20,7 +20,7 @@ job_queue = updater.job_queue
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def start(update, context):
-    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. You can get a list of available commands by typing /"
+    text = "Hello fellow Garudian! I am still a work in progress, so please treat me nicely. You can get a list of available commands by typing /help"
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def get_uhms_link(update, context):
@@ -34,15 +34,24 @@ def get_meal_credits_link(update, context):
 def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
+def help(update, context):
+    text = '''These are the available commands: \n 
+    /upload_doorway_picture - for you to upload your doorway picture \n
+    /get_uhms_link - gets the link for the uhms website \n
+    /get_meal_credits_link - gets the link to check for your meal credit balance'''
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
 start_handler = CommandHandler('start', start)
 uhms_link_handler = CommandHandler('get_uhms_link', get_uhms_link)
 meal_credits_handler = CommandHandler('get_meal_credits_link', get_meal_credits_link)
+help_handler =  CommandHandler('help', help)
 unknown_handler = MessageHandler(Filters.command, unknown)
 
 # Note to self: order of adding the handlers are important
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(uhms_link_handler)
 dispatcher.add_handler(meal_credits_handler)
+dispatcher.add_handler(help_handler)
 dispatcher.add_handler(get_conv_handler())
 dispatcher.add_handler(unknown_handler)
 
