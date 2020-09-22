@@ -12,6 +12,7 @@ import os
 TOKEN = os.environ['token']
 
 # Construct Telegram updater and dispatcher objects
+# New comment by James
 updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 job_queue = updater.job_queue
